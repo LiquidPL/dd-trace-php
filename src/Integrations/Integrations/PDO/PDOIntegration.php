@@ -33,13 +33,28 @@ class PDOIntegration extends Integration
         }
 
         $integration = $this;
+        $lastQuerySpan = null;
 
         // public PDO::__construct ( string $dsn [, string $username [, string $passwd [, array $options ]]] )
-        \DDTrace\trace_method('PDO', '__construct', function (SpanData $span, array $args) {
+        \DDTrace\trace_method('PDO', '__construct', function (SpanData $span, array $args) use (&$lastQuerySpan) {
             $span->name = $span->resource = 'PDO.__construct';
             $span->service = 'pdo';
             $span->type = Type::SQL;
             $span->meta = PDOIntegration::storeConnectionParams($this, $args);
+
+            // Unmark the last query as error if caused by mysql server going away and immediately reconnecting
+            // but preserve exception / error message metadata for understanding purposes
+            if ($lastQuerySpan && !\array_diff($span->meta, $lastQuerySpan->meta)) {
+                $errorMsg = "";
+                if ($lastQuerySpan->exception instanceof \PDOException) {
+                    $errorMsg = $lastQuerySpan->exception->getMessage();
+                } elseif (isset($lastQuerySpan->meta[Tag::ERROR_MSG])) {
+                    $errorMsg = $lastQuerySpan->meta[Tag::ERROR_MSG];
+                }
+                if (strpos($errorMsg, "MySQL server has gone away") !== false) {
+                    $lastQuerySpan->meta[Tag::ERROR] = 0;
+                }
+            }
         });
 
         // public int PDO::exec(string $query)
@@ -63,21 +78,26 @@ class PDOIntegration extends Integration
         // public PDOStatement PDO::query(string $query, int PDO::FETCH_CLASS, string $classname, array $ctorargs)
         // public PDOStatement PDO::query(string $query, int PDO::FETCH_INFO, object $object)
         // public int PDO::exec(string $query)
-        \DDTrace\trace_method('PDO', 'query', function (SpanData $span, array $args, $retval) use ($integration) {
-            $span->name = 'PDO.query';
-            $span->service = 'pdo';
-            $span->type = Type::SQL;
-            $span->resource = Integration::toString($args[0]);
-            if ($retval instanceof \PDOStatement) {
-                $span->meta = [
-                    'db.rowcount' => $retval->rowCount(),
-                ];
-                PDOIntegration::storeStatementFromConnection($this, $retval);
+        \DDTrace\trace_method(
+            'PDO',
+            'query',
+            function (SpanData $span, array $args, $retval) use ($integration, &$lastQuerySpan) {
+                $lastQuerySpan = $span;
+                $span->name = 'PDO.query';
+                $span->service = 'pdo';
+                $span->type = Type::SQL;
+                $span->resource = Integration::toString($args[0]);
+                if ($retval instanceof \PDOStatement) {
+                    $span->meta = [
+                        'db.rowcount' => $retval->rowCount(),
+                    ];
+                    PDOIntegration::storeStatementFromConnection($this, $retval);
+                }
+                PDOIntegration::setConnectionTags($this, $span);
+                $integration->addTraceAnalyticsIfEnabled($span);
+                PDOIntegration::detectError($this, $span);
             }
-            PDOIntegration::setConnectionTags($this, $span);
-            $integration->addTraceAnalyticsIfEnabled($span);
-            PDOIntegration::detectError($this, $span);
-        });
+        );
 
         // public bool PDO::commit ( void )
         \DDTrace\trace_method('PDO', 'commit', function (SpanData $span) {
@@ -88,7 +108,8 @@ class PDOIntegration extends Integration
         });
 
         // public PDOStatement PDO::prepare ( string $statement [, array $driver_options = array() ] )
-        \DDTrace\trace_method('PDO', 'prepare', function (SpanData $span, array $args, $retval) {
+        \DDTrace\trace_method('PDO', 'prepare', function (SpanData $span, array $args, $retval) use (&$lastQuerySpan) {
+            $lastQuerySpan = $span;
             $span->name = 'PDO.prepare';
             $span->service = 'pdo';
             $span->type = Type::SQL;
@@ -101,7 +122,8 @@ class PDOIntegration extends Integration
         \DDTrace\trace_method(
             'PDOStatement',
             'execute',
-            function (SpanData $span, array $args, $retval) use ($integration) {
+            function (SpanData $span, array $args, $retval) use ($integration, &$lastQuerySpan) {
+                $lastQuerySpan = $span;
                 $span->name = 'PDOStatement.execute';
                 $span->service = 'pdo';
                 $span->type = Type::SQL;
