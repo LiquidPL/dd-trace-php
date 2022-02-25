@@ -8,7 +8,7 @@ RUN echo $'[nginx]\nname=nginx repo\nbaseurl=https://nginx.org/packages/mainline
 
 RUN \
     rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
-    && yum install -y elinks wget nginx httpd unzip gdb git nc \
+    && yum install -y elinks wget nginx httpd unzip gdb git nc net-tools lsof \
     && rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm \
     && yum --enablerepo=remi-php${PHP_MAJOR}${PHP_MINOR} install -y \
             php-cli \
