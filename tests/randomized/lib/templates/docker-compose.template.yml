@@ -67,7 +67,7 @@ services:
       - ../.results/{{identifier}}/corefiles:/tmp/corefiles
     environment:
         DURATION: ${DURATION}
-        INSTALL_MODE: {{installation_method}}
+        INSTALL_MODE: notracer
         TEST_SCENARIO: {{identifier}}
     depends_on:
       - agent

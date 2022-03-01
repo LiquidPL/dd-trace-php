@@ -12,6 +12,8 @@ if [ "${INSTALL_MODE}" == "package" ]; then
 elif [ "${INSTALL_MODE}" == "pecl" ]; then
     echo "PECL installation mode not supported yet"
     exit 1
+elif [ "${INSTALL_MODE}" == "notracer" ]; then
+    echo "Tracer not installed"
 else
     echo "Unknown installation mode"
     exit 1
