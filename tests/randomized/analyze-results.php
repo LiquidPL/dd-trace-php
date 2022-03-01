@@ -79,6 +79,7 @@ function analyze_web($tmpScenariosFolder)
 
 function analyze_cli($tmpScenariosFolder)
 {
+    return true;
     $resultsFolder = $tmpScenariosFolder . DIRECTORY_SEPARATOR . '.results';
     $analyzed = [];
     $notEnoughResults = [];
