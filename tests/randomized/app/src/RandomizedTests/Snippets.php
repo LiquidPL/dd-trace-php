@@ -38,9 +38,9 @@ class Snippets
                     break;
                 case 'guzzle':
                     switch ($pickAVariant) {
-                        case 1:
-                            $this->guzzleVariant1();
-                            break;
+                        // case 1:
+                        //     $this->guzzleVariant1();
+                        //     break;
                         default:
                             throw new \Exception('Unknown variant: ' . $integrationName . ' -> ' . $pickAVariant);
                     }
@@ -65,30 +65,30 @@ class Snippets
                     break;
                 case 'curl':
                     switch ($pickAVariant) {
-                        case 1:
-                            $this->curlVariant1();
-                            break;
-                        case 2:
-                            $this->curlVariant2();
-                            break;
-                        case 3:
-                            $this->curlVariant3();
-                            break;
-                        case 4:
-                            $this->curlVariant4();
-                            break;
-                        case 5:
-                            $this->curlVariant5();
-                            break;
-                        case 6:
-                            $this->curlVariant6();
-                            break;
-                        case 7:
-                            $this->curlVariant7();
-                            break;
-                        case 8:
-                            $this->curlVariant8();
-                            break;
+                        // case 1:
+                        //     $this->curlVariant1();
+                        //     break;
+                        // case 2:
+                        //     $this->curlVariant2();
+                        //     break;
+                        // case 3:
+                        //     $this->curlVariant3();
+                        //     break;
+                        // case 4:
+                        //     $this->curlVariant4();
+                        //     break;
+                        // case 5:
+                        //     $this->curlVariant5();
+                        //     break;
+                        // case 6:
+                        //     $this->curlVariant6();
+                        //     break;
+                        // case 7:
+                        //     $this->curlVariant7();
+                        //     break;
+                        // case 8:
+                        //     $this->curlVariant8();
+                        //     break;
                         default:
                             throw new \Exception('Unknown variant: ' . $integrationName . ' -> ' . $pickAVariant);
                     }
