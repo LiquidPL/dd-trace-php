@@ -990,7 +990,7 @@ jobs:
           command: make -C tests/randomized library.local
       - run:
           name: Reducing /proc/sys/net/ipv4/tcp_fin_timeout
-          command: sudo sysctl net.ipv4.tcp_fin_timeout=1
+          command: sudo sysctl -w net.ipv4.ip_local_port_range="10000 65530"
       - run:
           name: Pull docker images
           command: make -C tests/randomized pull
