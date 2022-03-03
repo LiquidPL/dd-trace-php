@@ -7,9 +7,8 @@
 #include <Zend/zend_interfaces.h>
 #include <Zend/zend_portability.h>
 #include <exceptions/exceptions.h>
+#include <functions/functions.h>
 #include <stdbool.h>
-#include <symbols/symbols.h>
-#include <value/value.h>
 
 #include "ext/php7/compatibility.h"
 #include "ext/php7/ddtrace.h"
@@ -129,11 +128,9 @@ static void dd_load_deferred_integration(zend_class_entry *scope, zval *fname, d
                            Z_STRVAL_P(fname));
     }
 
-    zval *rv;
-    ZAI_VALUE_INIT(rv);
-    bool success =
-        zai_symbol_call_literal(ZEND_STRL("ddtrace\\integrations\\load_deferred_integration"), &rv, 1, &integration);
-    ZAI_VALUE_DTOR(rv);
+    zval retval = {0};
+    bool success = zai_call_function_literal("ddtrace\\integrations\\load_deferred_integration", &retval, integration);
+    zval_ptr_dtor(&retval);
 
     ddtrace_dispatch_release(*dispatch);
 

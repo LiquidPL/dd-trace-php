@@ -2,6 +2,8 @@ extern "C" {
 #include "config_test_helpers.h"
 
 #include "config/config.h"
+#include "tea/sapi.h"
+#include "tea/extension.h"
 #include "ext_zai_config.h"
 }
 

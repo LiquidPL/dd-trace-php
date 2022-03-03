@@ -1,5 +1,6 @@
 extern "C" {
 #include "sandbox/sandbox.h"
+#include "tea/sapi.h"
 #include "tea/error.h"
 #include "tea/exceptions.h"
 }

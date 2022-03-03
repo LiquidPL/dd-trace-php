@@ -5,6 +5,7 @@
 #include <exceptions/exceptions.h>
 #include <inttypes.h>
 #include <php.h>
+#include <properties/properties.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
